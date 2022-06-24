@@ -6,10 +6,12 @@ int  fs_format();
 int  fs_mount();
 
 int  fs_create();
-int  fs_delete( int inumber );
+int  fs_delete( int inumber, int dir_inumber);
 int  fs_getsize();
 
 int  fs_read( int inumber, char *data, int length, int offset );
 int  fs_write( int inumber, const char *data, int length, int offset );
+int fs_delete_dir(int dir_inode_no);
+int fs_create_dir(char* dir_path);
 
 #endif
