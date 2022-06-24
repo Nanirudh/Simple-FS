@@ -81,27 +81,28 @@ int main( int argc, char *argv[] )
 			}
 			
 		} else if(!strcmp(cmd,"create")) {
-			if(args==1) {
-				inumber = fs_create();
-				/* Bug fixed on April 30th: check for inumber>=0 */
+			if(args==3) {
+				int dir_inode_no = atoi(arg1);
+				inumber = fs_create(dir_inode_no, arg2);
 				if(inumber>=0) {
 					printf("created inode %d\n",inumber);
 				} else {
 					printf("create failed!\n");
 				}
 			} else {
-				printf("use: create\n");
+				printf("use: create <dir inode no> <file name>\n");
 			}
 		} else if(!strcmp(cmd,"delete")) {
-			if(args==2) {
-				inumber = atoi(arg1);
-				if(fs_delete(inumber)) {
+			if(args==3) {
+				inumber         = atoi(arg1);
+				int dir_inumber = atoi(arg2); 
+				if(fs_delete(inumber, dir_inumber)) {
 					printf("inode %d deleted.\n",inumber);
 				} else {
 					printf("delete failed!\n");	
 				}
 			} else {
-				printf("use: delete <inumber>\n");
+				printf("use: delete <inumber> <dir inumber>\n");
 			}
 		} else if(!strcmp(cmd,"cat")) {
 			if(args==2) {
@@ -137,16 +138,42 @@ int main( int argc, char *argv[] )
 				printf("use: copyout <inumber> <filename>\n");
 			}
 
+		} else if(!strcmp(cmd, "mkdir")) {
+			if(args==2) {
+				if(fs_create_dir(arg1)==-1) {
+					printf("directory could not be created.Please provide a valid path (or) disk is full\n");
+				} else {
+					printf("directory created\n");
+				}
+			} else {
+				printf("use: mkdir <path>\n");
+			}
+			//test();
+
+		} else if(!strcmp(cmd, "rmdir")) {
+			if(args==2) {
+				inumber = atoi(arg1);
+				if(fs_delete_dir(inumber)==-1) {
+					printf("directory could not be created.Please provide a valid directory inode num\n");
+				} else {
+					printf("directory and its files deleted\n");
+				}
+			} else {
+				printf("use: mkdir <path>\n");
+			}
+			//test();
+
 		} else if(!strcmp(cmd,"help")) {
 			printf("Commands are:\n");
 			printf("    format\n");
 			printf("    mount\n");
 			printf("    debug\n");
-			printf("    create\n");
-			printf("    delete  <inode>\n");
+			printf("    create <parent dir inode no> <file name>\n");
+			printf("    delete  <inode> <parent dir inode>\n");
 			printf("    cat     <inode>\n");
 			printf("    copyin  <file> <inode>\n");
 			printf("    copyout <inode> <file>\n");
+			printf("    mkdir <path>\n");
 			printf("    help\n");
 			printf("    quit\n");
 			printf("    exit\n");
@@ -178,6 +205,8 @@ static int do_copyin( const char *filename, int inumber )
 		printf("couldn't open %s: %s\n",filename,strerror(errno));
 		return 0;
 	}
+    
+    
 
 	while(1) {
 		result = fread(buffer,1,sizeof(buffer),file);
