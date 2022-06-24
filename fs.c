@@ -1,7 +1,3 @@
-/*
-Code template taken from https://www-users.cselabs.umn.edu/classes/Fall-2019/csci5103/tmp/project3/project3.html
-*/
-
 #include "fs.h"
 #include "disk.h"
 
